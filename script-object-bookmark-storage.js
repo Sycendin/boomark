@@ -6,7 +6,7 @@ const websiteNameEl = document.querySelector('#website-name');
 const websiteUrlEl = document.querySelector('#website-url');
 const bookmarksContainer = document.querySelector('#bookmarks-container');
 
-let bookmarks = [];
+let bookmarks = {};
 //Show modal 
 const showModal = () =>{
     modal.classList.add('show-modal');
@@ -39,8 +39,8 @@ const validate= (nameValue, urlValue)=>{
 const buildBookmarks = () =>{
     // Remove all bookmarks
     bookmarksContainer.textContent='';
-    bookmarks.forEach((bookmark)=>{
-        const {name, url} = bookmark;
+    Object.keys(bookmarks).forEach((id)=>{
+        const {name, url} = bookmarks[id];
         // Item
         const item = document.createElement('div');
         item.classList.add('item');
@@ -73,24 +73,24 @@ const fetchBookmarks = () =>{
     }
     else{
         //Create bookmarks array in localStorage
-        bookmarks = [
+        const id= `http://google.com`
+        bookmarks[id] =
             {
                 name: 'Google',
-                url: "https://google.com",
+                url: 'https://google.com',
             }
-        ];
         localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     }
     buildBookmarks();
 }
 // Delete bookmark
-const deleteBookmark = (url) =>{
-    bookmarks.forEach((bookmark, i)=>{
-        if (bookmark.url === url){
-            // If found delete one item at index 1 (that bookmark)
-            bookmarks.splice(i, 1)
-        }
-    });
+const deleteBookmark = (id) =>{
+    console.log(bookmarks)
+    console.log(bookmarks[id])
+    // Find key and delete it
+    if (bookmarks[id]){
+        delete bookmarks[id]
+    }
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
 
     fetchBookmarks();
@@ -106,11 +106,14 @@ const storeBookmark = (e) =>{
     if(!validate(nameValue,urlValue)){
         return false;
     }
-    const bookmark = {
-        name: nameValue,
-        url: urlValue,
-    };
-    bookmarks.push(bookmark)
+    // Create bookmark object of {url {name:name, url:url}}
+    const bookmark = {}
+    bookmark.name = nameValue
+    bookmark.url = urlValue
+    const content = {}
+    content[urlValue] = bookmark
+
+    Object.assign(bookmarks, content)
 
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
